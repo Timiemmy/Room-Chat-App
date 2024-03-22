@@ -6,11 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Messages</title>
+    <title>Chat Room App</title>
     <!-- load static -->
     {% load static %}
     <!-- <link rel="stylesheet" href="{% static 'style.css' %}"> -->
     <!-- link to h=css file -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Space+Grotesk:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -31,11 +35,11 @@
                         {% for i in messages %}
                         {% if i.sender != user %}
                         <div class="receive">
-                            <p style="color: #000;"> {{i.message}}<strong>-{{i.sender}}</strong></p>
+                            <p style="color: #ffffff;"> {{i.message}}<strong> - {{i.sender|capfirst}}</strong></p>
                         </div>
 
                         <div class="send">
-                            <p style="color: #000;">{{i.message}}</p>
+                            <p style="color: #ffffff;">{{i.message}}</p>
                         </div>
                         {% endif %}
                         {% endfor %}
@@ -94,12 +98,40 @@
         );
     });
 
+
+    // Response from consumer on the server
+    socket.addEventListener("message", (event) => {
+        const messageData = JSON.parse(event.data)['message'];
+        console.log(messageData);
+
+        var sender = messageData['sender'];
+        var message = messageData['message'];
+
+        // Empty the message input field after the message has been sent
+        if (sender == '{{user}}') {
+            document.getElementById('msg').value = '';
+        }
+
+        // Append the message to the chatbox
+        var messageDiv = document.querySelector('.message');
+        if (sender != '{{user}}') { // Assuming you have a variable `currentUser` to hold the current user's name
+            messageDiv.innerHTML += '<div class="receive"><p style="color: #000;">' + message + '<strong>-' + sender + '</strong></p></div>';
+        } else {
+            messageDiv.innerHTML += '<div class="send"><p style="color: #000;">' + message + '</p></div>';
+        }
+        scrollToBottom();
+    });
+
 </script>
 <style>
+    
     * {
         padding: 0;
         margin: 0;
         box-sizing: border-box;
+        font-family: "Roboto Flex", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
     }
 
 
@@ -151,7 +183,7 @@
         margin: 10px;
         border-radius: 10px;
 
-        background-color: white;
+        background-color: rgb(204, 33, 33);
     }
 
     .chat-room {
@@ -181,7 +213,7 @@
     }
 
     .chat-room h3 {
-        color: #000;
+        color: #f7f7f7;
     }
 
     .chat-room h3 {
@@ -203,7 +235,7 @@
         margin: 10px;
         border-radius: 10px;
         padding: 10px;
-        background-color: #FBEEC1;
+        background-color: #ffffff;
     }
 
     .chat-body-parent {
@@ -232,7 +264,7 @@
 
     .chat-body .message .receive,
     .send {
-        background-color: #B1A296;
+        background-color: #214930;
         max-width: 400px;
 
         border-radius: 10px;
@@ -274,10 +306,10 @@
     form button {
         width: 25%;
         padding: 10px;
-        background-color: #FBEEC1;
+        background-color: #064d1d;
         border-radius: 5px;
         border: none;
-        color: #000;
+        color: #ffffff;
     }
 
     @media only screen and (max-width: 600px) {
